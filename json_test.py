@@ -1,23 +1,37 @@
 # --encoding=utf8--
-#coding=utf-8
+# coding=utf-8
 import json
+from datetime import datetime,timedelta
 if __name__ == "__main__":
+    totalSoldHistory = '2019-05-08 18:37:17|11,2019-05-20 11:13:27|15,2019-06-01 09:31:33|18,'
+    dailySoldHistory = ''
+    biz_date = '2019-06-16'
+    #当天总销量
+    biz_date_total_count = -1
+    #昨天总销量
+    biz_date_total_count_before = -1
+    totalSoldHistoryList = list(map(lambda d:d.split('|'),totalSoldHistory.rstrip(',').split(',')))
+    totalSoldHistoryList.reverse()
+    for kv in totalSoldHistoryList:
+        kv_index = totalSoldHistoryList.index(kv)
+        sold_count_date = datetime.strptime(kv[0],'%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+        sold_count_value = kv[1]
+        if sold_count_date<=biz_date:
+            biz_date_total_count = sold_count_value
+            if kv_index != len(totalSoldHistoryList)-1:
+                biz_date_total_count_before = totalSoldHistoryList[kv_index+1][1]
+            break
     
-    js = '{"groupProps":[{"基本信息":[{"保修期":"12个月 "},{"净重":"42kg "},{"制冷方式":"直冷 "},{"包装尺寸":"1185x615x975mm "},{"品牌":"Haier/海尔 "},{"型号":"FCD-215SEA "},{"堆码层数极限":"4层 "},{"尺寸":"1150x560x920mm "},{"开门方式":"蝴蝶门 "},{"毛重":"48kg "},{"采购地":"中国大陆 "},{"颜色分类":"白色 "},{"放置方式":"卧式 "},{"功能":"冷藏冷冻 "},{"容量":"201L(含)-250L(含) "},{"冷冻能力":"13kg/24h "},{"耗电量":"0.69Kwh/24h及以下 "},{"能效等级":"二级 "}]}]}'
-    js_decode = js.encode('utf8')
-    iteminfo = json.loads(js_decode)
-    for prop_group_name in iteminfo:
-        props_group = iteminfo[prop_group_name]
-        for group in props_group:
-            for group_key in group:
-                print(group_key)
-                props = group[group_key]
-                for prop_key_value in props:
-                    for prop_key in prop_key_value:
-                        print('key:%s' % prop_key)
-                        print('value: %s' % prop_key_value[prop_key])
-                        #print(prop_value)
-        
-        
+    print(biz_date_total_count)
+    print(biz_date_total_count_before)
+    
 
-                
+    if biz_date_total_count is not -1 and biz_date_total_count_before is not -1:
+        print(int(biz_date_total_count)-int(biz_date_total_count_before))
+    if dailySoldHistory is None or dailySoldHistory =='':
+        print(-1)
+    daily_count_array = dailySoldHistory.split(',')
+    for key in daily_count_array:
+        if key.startswith(biz_date):
+            print(int(key.split('|')[1]))
+    print(-1)
